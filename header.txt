@@ -1,10 +1,10 @@
 // ==UserScript==
-// @name         模板项目
-// @author       作者名
+// @name         NGA安科扩展
+// @author       憧憬少
 // @version      1.0.0
-// @description  这是海豹的js扩展模板项目，请自行修改信息
-// @timestamp    1674477074
-// 2023/1/23
+// @description  提供一些对NGA安科帖子的查询和吞楼检查
+// @timestamp    1676284056
+// 2023-2-13 18:27:36
 // @license      MIT
-// @homepageURL  https://github.com/sealdice/sealdice-js-template
+// @homepageURL  https://github.com/ChangingSelf/sealdice-js-ext-anko-thread
 // ==/UserScript==

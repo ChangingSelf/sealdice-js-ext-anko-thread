@@ -1,4 +1,4 @@
-var filename = 'sealdice-js-ext.js'
+var filename = 'sealdice-js-ext-anko-thread.js'
 
 module.exports = {
   dev: {
