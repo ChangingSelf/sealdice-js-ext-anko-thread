@@ -17,6 +17,7 @@ const DOMAIN_NAME = "ngabbs.com";//nga的域名，要是某个域名崩了，你
 const HELP = `<尖括号内为必填参数，写的时候不带尖括号>
 [方括号内为可选参数，写的时候不带方括号]
 # 后面为注释，解释命令的作用
+.安科可以用.anko替代
 
 .安科 吞楼检查 [第几页] [帖子tid]
 # 默认为最新页，tid默认为你使用“记录”添加的内容
@@ -29,6 +30,9 @@ const HELP = `<尖括号内为必填参数，写的时候不带尖括号>
 
 .安科 停留时间 [第几页]
 # 默认查看帖子在首页停留时间
+
+.安科 查询 [帖子tid]
+#查询帖子详细信息，默认使用已保存的tid
 `;
 
 function queryTid(ext:seal.ExtInfo,qq:string) {
@@ -45,7 +49,7 @@ function main() {
   // 注册扩展
   let ext = seal.ext.find('ankoThread');
   if (!ext) {
-    ext = seal.ext.new('ankoThread', '憧憬少', '1.0.0');
+    ext = seal.ext.new('ankoThread', '憧憬少', '1.1.0');
     seal.ext.register(ext);
   }
 
@@ -124,7 +128,11 @@ function main() {
                   }
                   
                 }
-                seal.replyToSender(ctx, msg, `[CQ:at,qq=${msg.sender.userId.replace("QQ:", "")}]\n链接：${url}\n页数：${curPage}\n被吞${missingList.length}层：${missingList.join(',')}`);
+
+                const thread = data['__T'];
+                const title = thread['subject'];
+                const author = thread['author'];
+                seal.replyToSender(ctx, msg, `标题:${title}\n链接:${url}\n作者:${author}\n页数：${curPage}\n被吞${missingList.length}层：${missingList.join(',')}`);
                 return seal.ext.newCmdExecuteResult(true);
               })
               return seal.ext.newCmdExecuteResult(true);
@@ -208,6 +216,57 @@ function main() {
               return seal.ext.newCmdExecuteResult(true);
             
           });
+          return seal.ext.newCmdExecuteResult(true);
+        }
+        case '查询': {
+          let tid = Number(cmdArgs.getArgN(2));
+          if (!tid) {
+            tid = queryTid(ext,msg.sender.userId);
+          }
+          
+          if (tid === -1) {
+            seal.replyToSender(ctx, msg, `<${msg.sender.nickname}>还没有记录任何帖子的tid，也没有传入tid`);
+          } else {
+            const url = `https://${DOMAIN_NAME}/read.php?tid=${tid}`;
+            const queryUrl = `${url}&__output=11`;
+            seal.replyToSender(ctx, msg, `正在查询${url}，请稍候`);
+            fetch(queryUrl, PARA).then(response => {
+              try {
+                if (!response.ok) {
+                  seal.replyToSender(ctx, msg, `访问失败，响应状态码为：${response.status}`);
+                  return seal.ext.newCmdExecuteResult(false);
+                }
+                response.json().then(data => {
+                  try {
+                    data = data['data'];
+
+                    const thread = data['__T'];
+                    const title = thread['subject'];
+                    const author = thread['author'];
+                    const replies = thread['replies'];
+                    const postdate = thread['postdate'];
+                    const lastpost = thread['lastpost'];
+                    let cover = '';
+                    // const attachs = thread?.post_misc_var?.attachs;
+                    // if (attachs) {
+                    //   // cover = `[CQ:image,file=https://img.nga.178.com/attachments/${attachs[0]['attachurl']},cache=0]`
+                    //   cover = JSON.stringify(attachs);
+                    // }
+                    
+                    seal.replyToSender(ctx, msg, `标题：${title}\n链接：${url}\n${cover}\n作者：${author}\n楼层：${replies}\n发布时间：${new Date(postdate * 1000).toLocaleString()}\n最后回复：${new Date(lastpost * 1000).toLocaleString()}`);
+                    return seal.ext.newCmdExecuteResult(false);
+                  } catch (error) {
+                    seal.replyToSender(ctx, msg, error.message);
+                    return seal.ext.newCmdExecuteResult(false);
+                  }
+                })
+                return seal.ext.newCmdExecuteResult(true);
+              } catch (error) {
+                seal.replyToSender(ctx, msg, error.message);
+                return seal.ext.newCmdExecuteResult(false);
+              }
+            })
+          }
           return seal.ext.newCmdExecuteResult(true);
         }
         case 'help':

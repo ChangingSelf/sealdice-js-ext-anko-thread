@@ -1,10 +1,10 @@
 // ==UserScript==
 // @name         NGA安科扩展
 // @author       憧憬少
-// @version      1.0.0
-// @description  提供一些对NGA安科帖子的查询和吞楼检查
-// @timestamp    1676284056
-// 2023-2-13 18:27:36
+// @version      1.1.0
+// @description  提供一些对NGA安科帖子的查询和吞楼检查。指令为“.安科”和“.anko”
+// @timestamp    1676607739
+// 2023-02-17 12:22:19
 // @license      MIT
 // @homepageURL  https://github.com/ChangingSelf/sealdice-js-ext-anko-thread
 // ==/UserScript==
