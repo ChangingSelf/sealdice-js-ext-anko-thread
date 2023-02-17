@@ -163,15 +163,6 @@ function main() {
           seal.replyToSender(ctx, msg, `已为<${msg.sender.nickname}>记录帖子tid，完整链接为：https://${DOMAIN_NAME}/read.php?tid=${tid}`);
           return seal.ext.newCmdExecuteResult(true);
         }
-        case '我的帖子': {
-          let tid = queryTid(ext,msg.sender.userId);
-          if (tid === -1) {
-            seal.replyToSender(ctx, msg, `<${msg.sender.nickname}>还没有记录任何帖子的tid`);
-          } else {
-            seal.replyToSender(ctx, msg, `<${msg.sender.nickname}>的安科帖：https://${DOMAIN_NAME}/read.php?tid=${tid}`);
-          }
-          return seal.ext.newCmdExecuteResult(true);
-        }
         case '停留时间': {
           let page = 1;//默认为首页
           if (cmdArgs.args.length >= 2) {
@@ -218,7 +209,7 @@ function main() {
           });
           return seal.ext.newCmdExecuteResult(true);
         }
-        case '查询': {
+        case '我的帖子':case '查询': {
           let tid = Number(cmdArgs.getArgN(2));
           if (!tid) {
             tid = queryTid(ext,msg.sender.userId);
@@ -247,11 +238,11 @@ function main() {
                     const postdate = thread['postdate'];
                     const lastpost = thread['lastpost'];
                     let cover = '';
-                    // const attachs = thread?.post_misc_var?.attachs;
-                    // if (attachs) {
-                    //   // cover = `[CQ:image,file=https://img.nga.178.com/attachments/${attachs[0]['attachurl']},cache=0]`
-                    //   cover = JSON.stringify(attachs);
-                    // }
+                    const attachs = thread?.post_misc_var?.attachs;
+                    console.log(JSON.stringify(attachs));
+                    if (attachs) {
+                      cover = `[CQ:image,file=https://img.nga.178.com/attachments/${attachs[0]['attachurl']},cache=0]`
+                    }
                     
                     seal.replyToSender(ctx, msg, `标题：${title}\n链接：${url}\n${cover}\n作者：${author}\n楼层：${replies}\n发布时间：${new Date(postdate * 1000).toLocaleString()}\n最后回复：${new Date(lastpost * 1000).toLocaleString()}`);
                     return seal.ext.newCmdExecuteResult(false);
